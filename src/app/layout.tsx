@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button"; // Added for potential use in header
 import { PanelLeft } from "lucide-react"; // Added for mobile trigger
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Serbian Savant",
@@ -23,27 +24,29 @@ export default function RootLayout({
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <div className="flex min-h-screen">
-            <AppSidebar />
-            <SidebarInset className="flex-1 flex flex-col">
-              <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 py-4 md:hidden">
-                {/* Mobile sidebar trigger */}
-                <SidebarTrigger asChild> 
-                  <Button size="icon" variant="outline">
-                    <PanelLeft />
-                    <span className="sr-only">Toggle Menu</span>
-                  </Button>
-                </SidebarTrigger>
-                <h1 className="text-xl font-semibold">Serbian Savant</h1>
-              </header>
-              <main className="flex-1 p-4 md:p-6">
-                {children}
-              </main>
-            </SidebarInset>
-          </div>
-          <Toaster />
-        </SidebarProvider>
+        <LanguageProvider>
+          <SidebarProvider>
+            <div className="flex min-h-screen">
+              <AppSidebar />
+              <SidebarInset className="flex-1 flex flex-col">
+                <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 py-4 md:hidden">
+                  {/* Mobile sidebar trigger */}
+                  <SidebarTrigger asChild> 
+                    <Button size="icon" variant="outline">
+                      <PanelLeft />
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </SidebarTrigger>
+                  <h1 className="text-xl font-semibold">Serbian Savant</h1>
+                </header>
+                <main className="flex-1 p-4 md:p-6">
+                  {children}
+                </main>
+              </SidebarInset>
+            </div>
+            <Toaster />
+          </SidebarProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

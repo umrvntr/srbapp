@@ -7,6 +7,7 @@ import type { WordEntry } from '@/types/word';
 import { WordCard } from '@/components/WordCard';
 import Link from 'next/link';
 import { addLearnedWord } from '@/lib/learnedWords';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface FlashcardViewProps {
   word: WordEntry;
@@ -20,6 +21,7 @@ interface FlashcardViewProps {
 
 export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, currentIndex, totalWords }: FlashcardViewProps) {
   const [isRevealed, setIsRevealed] = useState(false);
+  const { language } = useLanguage();
 
   const handleToggleReveal = () => {
     setIsRevealed(!isRevealed);
@@ -28,13 +30,19 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
     }
   };
 
+  const translations = {
+    previous: language === 'ru' ? 'Назад' : 'Previous',
+    next: language === 'ru' ? 'Вперед' : 'Next',
+    dictionary: language === 'ru' ? 'Мой словарь' : 'My Dictionary'
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
         <Button asChild variant="ghost" size="sm">
           <Link href="/dictionary" className="flex items-center gap-2">
             <BookOpen className="h-4 w-4" />
-            Мой словарь
+            {translations.dictionary}
           </Link>
         </Button>
       </div>
@@ -42,14 +50,13 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
         word={word}
         onReveal={handleToggleReveal}
         revealed={isRevealed}
-        interfaceLanguage="ru"
       />
       <div className="flex justify-between w-full">
         <Button onClick={onPrevious} disabled={isFirst} variant="outline">
-          <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+          <ChevronLeft className="mr-2 h-4 w-4" /> {translations.previous}
         </Button>
         <Button onClick={onNext} disabled={isLast} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-          Next <ChevronRight className="ml-2 h-4 w-4" />
+          {translations.next} <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     </div>

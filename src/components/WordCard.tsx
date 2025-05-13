@@ -6,16 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Volume2 } from 'lucide-react';
 import type { WordEntry } from '@/types/word';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface WordCardProps {
   word: WordEntry;
   onReveal: () => void;
   revealed: boolean;
-  interfaceLanguage: 'ru' | 'en';
 }
 
-export function WordCard({ word, onReveal, revealed, interfaceLanguage }: WordCardProps) {
+export function WordCard({ word, onReveal, revealed }: WordCardProps) {
   const [showLatin, setShowLatin] = useState(true);
+  const { language } = useLanguage();
 
   // Placeholder for text-to-speech
   const handlePlayAudio = (text: string, lang: string = 'sr-RS') => {
@@ -28,12 +29,20 @@ export function WordCard({ word, onReveal, revealed, interfaceLanguage }: WordCa
     }
   };
 
+  const translations = {
+    title: language === 'ru' ? 'Карточка слова' : 'Word Card',
+    reveal: language === 'ru' ? 'Показать' : 'Reveal',
+    hide: language === 'ru' ? 'Скрыть' : 'Hide',
+    answer: language === 'ru' ? 'ответ' : 'Answer',
+    clickToReveal: language === 'ru' ? 'Нажмите, чтобы увидеть перевод и пример.' : 'Click to reveal translation and example.'
+  };
+
   return (
     <Card className="w-full max-w-2xl shadow-xl mx-auto">
       <CardHeader className="bg-secondary rounded-t-lg p-4">
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl text-secondary-foreground">
-            {interfaceLanguage === 'ru' ? 'Карточка слова' : 'Word Card'}
+            {translations.title}
           </CardTitle>
           <div className="flex items-center space-x-2">
             <Label htmlFor="script-toggle" className="text-sm text-secondary-foreground">
@@ -61,7 +70,7 @@ export function WordCard({ word, onReveal, revealed, interfaceLanguage }: WordCa
         {revealed ? (
           <div className="space-y-4 animate-in fade-in duration-500">
             <p className="text-2xl text-foreground">
-              {interfaceLanguage === 'ru' ? word.translation_ru : word.translation_en}
+              {language === 'ru' ? word.translation_ru : word.translation_en}
             </p>
             <Separator />
             <div className="space-y-2">
@@ -69,22 +78,22 @@ export function WordCard({ word, onReveal, revealed, interfaceLanguage }: WordCa
                 "{word.example_sr}"
               </p>
               <p className="text-md text-muted-foreground italic">
-                "{interfaceLanguage === 'ru' ? word.example_ru : word.example_en}"
+                "{language === 'ru' ? word.example_ru : word.example_en}"
               </p>
             </div>
             <div className="text-sm text-muted-foreground">
-              {interfaceLanguage === 'ru' ? word.transcription_ru : word.transcription_en}
+              {language === 'ru' ? word.transcription_ru : word.transcription_en}
             </div>
           </div>
         ) : (
           <p className="text-xl text-muted-foreground">
-            {interfaceLanguage === 'ru' ? 'Нажмите, чтобы увидеть перевод и пример.' : 'Click to reveal translation and example.'}
+            {translations.clickToReveal}
           </p>
         )}
       </CardContent>
       <CardFooter>
         <Button onClick={onReveal} variant="outline" className="w-full">
-          {revealed ? (interfaceLanguage === 'ru' ? 'Скрыть' : 'Hide') : (interfaceLanguage === 'ru' ? 'Показать' : 'Reveal')} {interfaceLanguage === 'ru' ? 'ответ' : 'Answer'}
+          {revealed ? translations.hide : translations.reveal} {translations.answer}
         </Button>
       </CardFooter>
     </Card>
