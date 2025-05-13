@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import { handleGenerateVocabularyWords } from '@/app/actions';
 import { useToast } from "@/hooks/use-toast";
 import type { VocabularyWord, ProficiencyLevel } from '@/types';
 import { Button } from '@/components/ui/button';
-import { ArrowPathIcon } from '@heroicons/react/24/outline'; // Using Heroicons for a specific icon
+// import { ArrowPathIcon } from '@heroicons/react/24/outline'; // Using Heroicons for a specific icon - Removed as it's not in package.json and defined inline
 import { Loader2, Info } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
