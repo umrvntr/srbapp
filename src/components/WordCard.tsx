@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Volume2 } from 'lucide-react';
 import type { WordEntry } from '@/types/word';
 import { useLanguage } from '@/context/LanguageContext';
+import { translations } from '@/lib/translations';
 
 interface WordCardProps {
   word: WordEntry;
@@ -17,6 +18,7 @@ interface WordCardProps {
 export function WordCard({ word, onReveal, revealed }: WordCardProps) {
   const [showLatin, setShowLatin] = useState(true);
   const { language } = useLanguage();
+  const t = translations[language];
 
   // Placeholder for text-to-speech
   const handlePlayAudio = (text: string, lang: string = 'sr-RS') => {
@@ -29,24 +31,20 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
     }
   };
 
-  const translations = {
-    title: language === 'ru' ? 'Карточка слова' : 'Word Card',
-    reveal: language === 'ru' ? 'Показать' : 'Reveal',
-    hide: language === 'ru' ? 'Скрыть' : 'Hide',
-    answer: language === 'ru' ? 'ответ' : 'Answer',
-    clickToReveal: language === 'ru' ? 'Нажмите, чтобы увидеть перевод и пример.' : 'Click to reveal translation and example.'
-  };
+  const translation = language === "ru" ? word.translation_ru : word.translation_en;
+  const example = language === "ru" ? word.example_ru : word.example_en;
+  const transcription = language === "ru" ? word.transcription_ru : word.transcription_en;
 
   return (
     <Card className="w-full max-w-2xl shadow-xl mx-auto">
       <CardHeader className="bg-secondary rounded-t-lg p-4">
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl text-secondary-foreground">
-            {translations.title}
+            {t.cardTitle}
           </CardTitle>
           <div className="flex items-center space-x-2">
             <Label htmlFor="script-toggle" className="text-sm text-secondary-foreground">
-              {showLatin ? 'Latin' : 'Cyrillic'}
+              {showLatin ? t.latin : t.cyrillic}
             </Label>
             <Switch
               id="script-toggle"
@@ -70,7 +68,7 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
         {revealed ? (
           <div className="space-y-4 animate-in fade-in duration-500">
             <p className="text-2xl text-foreground">
-              {language === 'ru' ? word.translation_ru : word.translation_en}
+              {translation}
             </p>
             <Separator />
             <div className="space-y-2">
@@ -78,22 +76,22 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
                 "{word.example_sr}"
               </p>
               <p className="text-md text-muted-foreground italic">
-                "{language === 'ru' ? word.example_ru : word.example_en}"
+                "{example}"
               </p>
             </div>
             <div className="text-sm text-muted-foreground">
-              {language === 'ru' ? word.transcription_ru : word.transcription_en}
+              {transcription}
             </div>
           </div>
         ) : (
           <p className="text-xl text-muted-foreground">
-            {translations.clickToReveal}
+            {t.prompt}
           </p>
         )}
       </CardContent>
       <CardFooter>
         <Button onClick={onReveal} variant="outline" className="w-full">
-          {revealed ? translations.hide : translations.reveal} {translations.answer}
+          {revealed ? t.hideAnswer : t.showAnswer}
         </Button>
       </CardFooter>
     </Card>
