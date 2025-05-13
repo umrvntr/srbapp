@@ -8,6 +8,7 @@ import {
   Puzzle,
   BarChart3,
   Settings,
+  User,
 } from "lucide-react";
 
 import {
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/flashcards", label: "Flashcards", icon: BookOpen },
   { href: "/quizzes", label: "Quizzes", icon: Puzzle },
   { href: "/progress", label: "Progress", icon: BarChart3 },
+  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export function AppSidebar() {
