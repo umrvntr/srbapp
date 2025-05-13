@@ -7,7 +7,7 @@ import { PanelLeft } from "lucide-react"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button" // Import ButtonProps
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
@@ -259,31 +259,49 @@ const Sidebar = React.forwardRef<
 )
 Sidebar.displayName = "Sidebar"
 
-const SidebarTrigger = React.forwardRef<
-  React.ElementRef<typeof Button>,
-  React.ComponentProps<typeof Button>
->(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar()
+const SidebarTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, onClick, asChild = false, children, ...props }, ref) => {
+    const { toggleSidebar } = useSidebar();
+    const Comp = asChild ? Slot : Button;
 
-  return (
-    <Button
-      ref={ref}
-      data-sidebar="trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("h-7 w-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <PanelLeft />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
-  )
-})
-SidebarTrigger.displayName = "SidebarTrigger"
+    const effectiveProps = {
+      ref: ref,
+      onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+        onClick?.(event);
+        toggleSidebar();
+      },
+      "data-sidebar": "trigger",
+      ...props, // Spreads variant, size, etc. from ButtonProps
+    };
+
+    if (asChild) {
+      // If asChild, Comp is Slot. It passes its props (effectiveProps + className)
+      // to its direct child (which is `children` passed to SidebarTrigger).
+      return (
+        <Comp className={className} {...effectiveProps}>
+          {children}
+        </Comp>
+      );
+    }
+
+    // If not asChild, Comp is Button. Render the default styled Button.
+    // Default variant/size are applied here, but can be overridden if
+    // `variant` or `size` are in `effectiveProps`.
+    return (
+      <Comp
+        variant="ghost" // Default variant for the trigger's own button
+        size="icon"     // Default size for the trigger's own button
+        className={cn("h-7 w-7", className)} // Default styling + custom className from SidebarTrigger
+        {...effectiveProps} // Includes ref, onClick, data-sidebar, and user-passed variant/size/etc.
+      >
+        <PanelLeft />
+        <span className="sr-only">Toggle Sidebar</span>
+      </Comp>
+    );
+  }
+);
+SidebarTrigger.displayName = "SidebarTrigger";
+
 
 const SidebarRail = React.forwardRef<
   HTMLButtonElement,
@@ -761,3 +779,4 @@ export {
   SidebarTrigger,
   useSidebar,
 }
+
