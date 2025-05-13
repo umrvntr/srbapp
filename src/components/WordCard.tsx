@@ -48,7 +48,7 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
 
   const translation = language === "ru" ? word.translation_ru : word.translation_en;
   const example = language === "ru" ? word.example_ru : word.example_en;
-  const pronunciation = showLatin ? word.pronunciation_en : word.pronunciation_ru;
+  const pronunciation = showLatin ? word.transcription_en : word.transcription_ru;
   const serbianText = showLatin ? word.serbian_latin : word.serbian_cyrillic;
 
   return (
