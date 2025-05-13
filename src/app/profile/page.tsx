@@ -7,12 +7,18 @@ import { getMomState } from "@/lib/momLogic";
 import { User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
+import { useState, useEffect } from "react";
 
 export default function ProfilePage() {
+  const [isClient, setIsClient] = useState(false);
   const words = getLearnedWords();
   const momState = getMomState();
   const { language, setLanguage } = useLanguage();
   const t = translations[language];
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const moodText = momState === "hungry" 
     ? language === "ru" ? "😢 Голоден" : "😢 Hungry"
@@ -37,7 +43,7 @@ export default function ProfilePage() {
             </div>
             <div className="p-4 bg-secondary rounded-lg">
               <p className="text-muted-foreground">{t.learnedLabel}</p>
-              <p className="text-xl font-semibold">{words.length}</p>
+              {isClient && <p className="text-xl font-semibold">{words.length}</p>}
             </div>
           </div>
           

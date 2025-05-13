@@ -11,7 +11,7 @@ import { translations } from '@/lib/translations';
 
 interface WordCardProps {
   word: WordEntry;
-  onReveal: () => void;
+  onReveal: (revealed: boolean) => void;
   revealed: boolean;
   currentWordIndex: number;
 }
@@ -21,6 +21,7 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
   const { language } = useLanguage();
   const t = translations[language];
 
+  // Reset revealed state when word changes
   useEffect(() => {
     onReveal(false);
   }, [currentWordIndex, onReveal]);
@@ -96,7 +97,7 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={onReveal} variant="outline" className="w-full">
+        <Button onClick={() => onReveal(!revealed)} variant="outline" className="w-full">
           {revealed ? t.hideAnswer : t.showAnswer}
         </Button>
       </CardFooter>

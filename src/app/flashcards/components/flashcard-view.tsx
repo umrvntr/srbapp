@@ -23,9 +23,9 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
   const [isRevealed, setIsRevealed] = useState(false);
   const { language } = useLanguage();
 
-  const handleToggleReveal = () => {
-    setIsRevealed(!isRevealed);
-    if (!isRevealed) {
+  const handleToggleReveal = (revealed: boolean) => {
+    setIsRevealed(revealed);
+    if (revealed) {
       addLearnedWord(word);
     }
   };
@@ -50,6 +50,7 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
         word={word}
         onReveal={handleToggleReveal}
         revealed={isRevealed}
+        currentWordIndex={currentIndex}
       />
       <div className="flex justify-between w-full">
         <Button onClick={onPrevious} disabled={isFirst} variant="outline">
