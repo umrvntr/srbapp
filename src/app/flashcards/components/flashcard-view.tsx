@@ -23,6 +23,15 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
   const [isRevealed, setIsRevealed] = useState(false);
   const { language } = useLanguage();
 
+  if (!word) {
+    console.warn("FlashcardView: word is undefined at index", currentIndex);
+    return (
+      <div className="p-4 rounded bg-muted text-muted-foreground text-center">
+        {language === 'ru' ? 'Нет слов для отображения.' : 'No words to display.'}
+      </div>
+    );
+  }
+
   const handleToggleReveal = (revealed: boolean) => {
     setIsRevealed(revealed);
     if (revealed) {
