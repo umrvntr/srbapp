@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { VocabularyWord } from '@/types';
+import type { WordEntry } from '@/types/word';
 import { WordCard } from '@/components/WordCard';
 
 interface FlashcardViewProps {
-  word: VocabularyWord;
+  word: WordEntry;
   onNext: () => void;
   onPrevious: () => void;
   isFirst: boolean;
@@ -29,6 +29,7 @@ export function FlashcardView({ word, onNext, onPrevious, isFirst, isLast, curre
         word={word}
         onReveal={handleToggleReveal}
         revealed={isRevealed}
+        interfaceLanguage="ru"
       />
       <div className="flex justify-between w-full">
         <Button onClick={onPrevious} disabled={isFirst} variant="outline">

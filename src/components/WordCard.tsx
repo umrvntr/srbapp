@@ -5,15 +5,16 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Volume2 } from 'lucide-react';
-import type { VocabularyWord } from '@/types';
+import type { WordEntry } from '@/types/word';
 
 interface WordCardProps {
-  word: VocabularyWord;
+  word: WordEntry;
   onReveal: () => void;
   revealed: boolean;
+  interfaceLanguage: 'ru' | 'en';
 }
 
-export function WordCard({ word, onReveal, revealed }: WordCardProps) {
+export function WordCard({ word, onReveal, revealed, interfaceLanguage }: WordCardProps) {
   const [showLatin, setShowLatin] = useState(true);
 
   // Placeholder for text-to-speech
@@ -32,7 +33,7 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
       <CardHeader className="bg-secondary rounded-t-lg p-4">
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl text-secondary-foreground">
-            Word Card
+            {interfaceLanguage === 'ru' ? 'Карточка слова' : 'Word Card'}
           </CardTitle>
           <div className="flex items-center space-x-2">
             <Label htmlFor="script-toggle" className="text-sm text-secondary-foreground">
@@ -47,31 +48,43 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-6 md:p-8">
+      <CardContent className="p-6">
         <div className="mb-6">
           <h2 className="text-5xl font-bold text-primary mb-2" lang="sr">
-            {showLatin ? word.serbianLatin : word.serbianCyrillic}
+            {word.serbian}
           </h2>
-          <Button variant="ghost" size="icon" onClick={() => handlePlayAudio(showLatin ? word.serbianLatin : word.serbianCyrillic)} aria-label="Play audio">
+          <Button variant="ghost" size="icon" onClick={() => handlePlayAudio(word.serbian)} aria-label="Play audio">
             <Volume2 className="h-6 w-6 text-muted-foreground" />
           </Button>
         </div>
 
         {revealed ? (
           <div className="space-y-4 animate-in fade-in duration-500">
-            <p className="text-2xl text-foreground">{word.englishTranslation}</p>
-            <Separator />
-            <p className="text-md text-muted-foreground italic" lang="sr">
-              "{word.exampleSentence}"
+            <p className="text-2xl text-foreground">
+              {interfaceLanguage === 'ru' ? word.translation_ru : word.translation_en}
             </p>
+            <Separator />
+            <div className="space-y-2">
+              <p className="text-md text-muted-foreground italic" lang="sr">
+                "{word.example_sr}"
+              </p>
+              <p className="text-md text-muted-foreground italic">
+                "{interfaceLanguage === 'ru' ? word.example_ru : word.example_en}"
+              </p>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {interfaceLanguage === 'ru' ? word.transcription_ru : word.transcription_en}
+            </div>
           </div>
         ) : (
-          <p className="text-xl text-muted-foreground">Click to reveal translation and example.</p>
+          <p className="text-xl text-muted-foreground">
+            {interfaceLanguage === 'ru' ? 'Нажмите, чтобы увидеть перевод и пример.' : 'Click to reveal translation and example.'}
+          </p>
         )}
       </CardContent>
       <CardFooter>
         <Button onClick={onReveal} variant="outline" className="w-full">
-          {revealed ? 'Hide' : 'Reveal'} Answer
+          {revealed ? (interfaceLanguage === 'ru' ? 'Скрыть' : 'Hide') : (interfaceLanguage === 'ru' ? 'Показать' : 'Reveal')} {interfaceLanguage === 'ru' ? 'ответ' : 'Answer'}
         </Button>
       </CardFooter>
     </Card>
