@@ -17,6 +17,15 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCardProps) {
+  if (!word) {
+    console.warn("WordCard: received undefined word at index", currentWordIndex);
+    return (
+      <Card className="w-full max-w-2xl shadow-xl mx-auto p-8 text-center text-muted-foreground">
+        Нет данных для отображения.
+      </Card>
+    );
+  }
+
   const [showLatin, setShowLatin] = useState(true);
   const { language } = useLanguage();
   const t = translations[language];
