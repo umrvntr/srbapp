@@ -7,7 +7,6 @@ import {
   BookOpen,
   Puzzle,
   BarChart3,
-  Settings,
   User,
 } from "lucide-react";
 
@@ -18,22 +17,42 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import SerbianSavantLogo from "@/components/serbian-savant-logo";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/flashcards", label: "Flashcards", icon: BookOpen },
-  { href: "/quizzes", label: "Quizzes", icon: Puzzle },
-  { href: "/progress", label: "Progress", icon: BarChart3 },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/", icon: LayoutDashboard },
+  { href: "/flashcards", icon: BookOpen },
+  { href: "/quizzes", icon: Puzzle },
+  { href: "/progress", icon: BarChart3 },
+  { href: "/profile", icon: User },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  const getNavLabel = (href: string) => {
+    switch (href) {
+      case "/":
+        return t.navDashboard;
+      case "/flashcards":
+        return t.navFlashcards;
+      case "/quizzes":
+        return t.navQuizzes;
+      case "/progress":
+        return t.navProgress;
+      case "/profile":
+        return t.navProfile;
+      default:
+        return "";
+    }
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -55,11 +74,11 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                   isActive={pathname === item.href}
-                  tooltip={item.label}
+                  tooltip={getNavLabel(item.href)}
                 >
                   <a>
                     <item.icon />
-                    <span>{item.label}</span>
+                    <span>{getNavLabel(item.href)}</span>
                   </a>
                 </SidebarMenuButton>
               </Link>
@@ -67,16 +86,6 @@ export function AppSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="p-2 border-t border-sidebar-border">
-        <SidebarMenu>
-          <SidebarMenuItem>
-             <SidebarMenuButton tooltip="Settings">
-                <Settings />
-                <span>Settings</span>
-              </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
     </Sidebar>
   );
 }

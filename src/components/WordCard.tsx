@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -13,12 +13,17 @@ interface WordCardProps {
   word: WordEntry;
   onReveal: () => void;
   revealed: boolean;
+  currentWordIndex: number;
 }
 
-export function WordCard({ word, onReveal, revealed }: WordCardProps) {
+export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCardProps) {
   const [showLatin, setShowLatin] = useState(true);
   const { language } = useLanguage();
   const t = translations[language];
+
+  useEffect(() => {
+    onReveal(false);
+  }, [currentWordIndex, onReveal]);
 
   // Placeholder for text-to-speech
   const handlePlayAudio = (text: string, lang: string = 'sr-RS') => {
@@ -33,7 +38,8 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
 
   const translation = language === "ru" ? word.translation_ru : word.translation_en;
   const example = language === "ru" ? word.example_ru : word.example_en;
-  const transcription = language === "ru" ? word.transcription_ru : word.transcription_en;
+  const pronunciation = showLatin ? word.pronunciation_en : word.pronunciation_ru;
+  const serbianText = showLatin ? word.serbian_latin : word.serbian_cyrillic;
 
   return (
     <Card className="w-full max-w-2xl shadow-xl mx-auto">
@@ -55,12 +61,12 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-6 md:p-8">
         <div className="mb-6">
           <h2 className="text-5xl font-bold text-primary mb-2" lang="sr">
-            {word.serbian}
+            {serbianText}
           </h2>
-          <Button variant="ghost" size="icon" onClick={() => handlePlayAudio(word.serbian)} aria-label="Play audio">
+          <Button variant="ghost" size="icon" onClick={() => handlePlayAudio(serbianText)} aria-label="Play audio">
             <Volume2 className="h-6 w-6 text-muted-foreground" />
           </Button>
         </div>
@@ -80,7 +86,7 @@ export function WordCard({ word, onReveal, revealed }: WordCardProps) {
               </p>
             </div>
             <div className="text-sm text-muted-foreground">
-              {transcription}
+              {pronunciation}
             </div>
           </div>
         ) : (

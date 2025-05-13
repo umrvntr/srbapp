@@ -1,6 +1,7 @@
 export interface WordEntry {
   id: string;
-  serbian: string;
+  serbian_latin: string;
+  serbian_cyrillic: string;
   translation_ru: string;
   translation_en: string;
   example_sr: string;
@@ -9,4 +10,6 @@ export interface WordEntry {
   transcription_ru: string;
   transcription_en: string;
   distractors: string[];
+  pronunciation_ru: string;
+  pronunciation_en: string;
 } 

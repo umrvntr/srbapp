@@ -4,12 +4,21 @@ import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMomState, updateMomVisit } from "@/lib/momLogic";
 import { getLearnedWords } from "@/lib/learnedWords";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/lib/translations";
 
 export default function ProgressPage() {
   const words = getLearnedWords();
   const state = getMomState();
+  const { language } = useLanguage();
+  const t = translations[language];
+
   const moodEmoji = state === "hungry" ? "😢" : state === "neutral" ? "😐" : "😊";
-  const moodText = state === "hungry" ? "Мом голоден..." : state === "neutral" ? "Мом ждёт тебя" : "Мом рад тебя видеть!";
+  const moodText = state === "hungry" 
+    ? language === "ru" ? "Мом голоден..." : "Momo is hungry..."
+    : state === "neutral" 
+    ? language === "ru" ? "Мом ждёт тебя" : "Momo is waiting for you"
+    : language === "ru" ? "Мом рад тебя видеть!" : "Momo is happy to see you!";
 
   useEffect(() => {
     updateMomVisit();
@@ -19,7 +28,7 @@ export default function ProgressPage() {
     <div className="container mx-auto py-8 px-4">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl">Прогресс обучения</CardTitle>
+          <CardTitle className="text-2xl">{t.navProgress}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="text-center p-6 bg-secondary rounded-lg">
@@ -31,7 +40,7 @@ export default function ProgressPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="text-3xl font-bold text-primary">{words.length}</div>
-                <p className="text-muted-foreground">Выучено слов</p>
+                <p className="text-muted-foreground">{t.learnedLabel}</p>
               </CardContent>
             </Card>
             <Card>
@@ -39,7 +48,7 @@ export default function ProgressPage() {
                 <div className="text-3xl font-bold text-primary">
                   {Math.round((words.length / 100) * 100)}%
                 </div>
-                <p className="text-muted-foreground">Прогресс</p>
+                <p className="text-muted-foreground">{t.navProgress}</p>
               </CardContent>
             </Card>
           </div>
