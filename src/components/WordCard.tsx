@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -16,38 +17,67 @@ interface WordCardProps {
   currentWordIndex: number;
 }
 
-export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCardProps) {
+// Memoize the component to prevent unnecessary re-renders
+export const WordCard = React.memo(function WordCard({ 
+  word, 
+  onReveal, 
+  revealed, 
+  currentWordIndex 
+}: WordCardProps) {
+  const [showLatin, setShowLatin] = useState(true);
+  const { language } = useLanguage();
+  const t = translations[language];
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+  const isInitialMount = useRef(true);
+
+  // Initialize speech synthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      speechSynthesisRef.current = window.speechSynthesis;
+    }
+  }, []);
+
+  // Memoize the audio handler with proper cleanup
+  const handlePlayAudio = useCallback((text: string, lang: string = 'sr-RS') => {
+    if (speechSynthesisRef.current) {
+      // Cancel any ongoing speech
+      speechSynthesisRef.current.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      speechSynthesisRef.current.speak(utterance);
+    } else {
+      console.warn('Text-to-speech is not supported in your browser.');
+    }
+  }, []);
+
+  // Memoize the reveal handler
+  const handleReveal = useCallback(() => {
+    onReveal(!revealed);
+  }, [onReveal, revealed]);
+
+  // Memoize the script toggle handler
+  const handleScriptToggle = useCallback((checked: boolean) => {
+    setShowLatin(checked);
+  }, []);
+
+  // Memoize derived values only if they're used in multiple places
+  const { serbianText, pronunciation, translation, example } = useMemo(() => ({
+    serbianText: showLatin ? word?.serbian_latin : word?.serbian_cyrillic,
+    pronunciation: showLatin ? word?.transcription_en : word?.transcription_ru,
+    translation: language === 'ru' ? word?.translation_ru : word?.translation_en,
+    example: language === 'ru' ? word?.example_ru : word?.example_en
+  }), [word, showLatin, language]);
+
+  // Early return for missing word
   if (!word) {
     console.warn("WordCard: received undefined word at index", currentWordIndex);
     return (
       <Card className="w-full max-w-2xl shadow-xl mx-auto p-8 text-center text-muted-foreground">
-        Нет данных для отображения.
+        {language === 'ru' ? 'Нет данных для отображения.' : 'No data to display.'}
       </Card>
     );
   }
-
-  const [showLatin, setShowLatin] = useState(true);
-  const { language } = useLanguage();
-  const t = translations[language];
-
-  useEffect(() => {
-    onReveal(false);
-  }, [currentWordIndex, onReveal]);
-
-  const handlePlayAudio = (text: string, lang: string = 'sr-RS') => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      window.speechSynthesis.speak(utterance);
-    } else {
-      alert('Text-to-speech is not supported in your browser.');
-    }
-  };
-
-  const serbianText = word.serbian;
-  const pronunciation = showLatin ? word.transcription_en : word.transcription_ru;
-  const translation = language === 'ru' ? word.translation_ru : word.translation_en;
-  const example = language === 'ru' ? word.example_ru : word.example_en;
 
   return (
     <Card className="w-full max-w-2xl shadow-xl mx-auto">
@@ -63,7 +93,7 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
             <Switch
               id="script-toggle"
               checked={showLatin}
-              onCheckedChange={setShowLatin}
+              onCheckedChange={handleScriptToggle}
               aria-label="Toggle script display"
             />
           </div>
@@ -74,7 +104,12 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
           <h2 className="text-5xl font-bold text-primary mb-2" lang="sr">
             {serbianText}
           </h2>
-          <Button variant="ghost" size="icon" onClick={() => handlePlayAudio(serbianText)} aria-label="Play audio">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handlePlayAudio(serbianText)} 
+            aria-label="Play audio"
+          >
             <Volume2 className="h-6 w-6 text-muted-foreground" />
           </Button>
         </div>
@@ -104,10 +139,14 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={() => onReveal(!revealed)} variant="outline" className="w-full">
+        <Button 
+          onClick={handleReveal} 
+          variant="outline" 
+          className="w-full"
+        >
           {revealed ? t.hideAnswer : t.showAnswer}
         </Button>
       </CardFooter>
     </Card>
   );
-}
+});
