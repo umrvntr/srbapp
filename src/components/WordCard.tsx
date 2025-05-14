@@ -30,12 +30,10 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
   const { language } = useLanguage();
   const t = translations[language];
 
-  // Reset revealed state when word changes
   useEffect(() => {
     onReveal(false);
   }, [currentWordIndex, onReveal]);
 
-  // Placeholder for text-to-speech
   const handlePlayAudio = (text: string, lang: string = 'sr-RS') => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -46,10 +44,10 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
     }
   };
 
-  const translation = language === "ru" ? word.translation_ru : word.translation_en;
-  const example = language === "ru" ? word.example_ru : word.example_en;
+  const serbianText = word.serbian;
   const pronunciation = showLatin ? word.transcription_en : word.transcription_ru;
-  const serbianText = showLatin ? word.serbian_latin : word.serbian_cyrillic;
+  const translation = language === 'ru' ? word.translation_ru : word.translation_en;
+  const example = language === 'ru' ? word.example_ru : word.example_en;
 
   return (
     <Card className="w-full max-w-2xl shadow-xl mx-auto">
@@ -66,7 +64,7 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
               id="script-toggle"
               checked={showLatin}
               onCheckedChange={setShowLatin}
-              aria-label="Toggle script between Latin and Cyrillic"
+              aria-label="Toggle script display"
             />
           </div>
         </div>
@@ -112,4 +110,4 @@ export function WordCard({ word, onReveal, revealed, currentWordIndex }: WordCar
       </CardFooter>
     </Card>
   );
-} 
+}
