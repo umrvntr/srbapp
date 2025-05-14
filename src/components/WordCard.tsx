@@ -28,6 +28,10 @@ export const WordCard = React.memo(function WordCard({
   const t = translations[language];
   const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
 
+  const cleanText = (text?: string) => text?.replace(/\[\[|\]\]/g, '') || '';
+
+  console.log('RAW:', word?.serbian_latin, 'CLEAN:', cleanText(word?.serbian_latin));
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       speechSynthesisRef.current = window.speechSynthesis;
@@ -51,9 +55,9 @@ export const WordCard = React.memo(function WordCard({
     setShowLatin(checked);
   }, []);
 
-  const { serbianText, pronunciation, translation, example } = useMemo(() => ({
-    serbianText: showLatin ? word?.serbian_latin : word?.serbian_cyrillic,
-    pronunciation: showLatin ? word?.transcription_en : word?.transcription_ru,
+  const { serbianText, transcription, translation, example } = useMemo(() => ({
+    serbianText: showLatin ? cleanText(word?.serbian_latin) : cleanText(word?.serbian_cyrillic),
+    transcription: showLatin ? word?.transcription_en : word?.transcription_ru,
     translation: language === 'ru' ? word?.translation_ru : word?.translation_en,
     example: language === 'ru' ? word?.example_ru : word?.example_en
   }), [word, showLatin, language]);
@@ -100,9 +104,9 @@ export const WordCard = React.memo(function WordCard({
         </div>
 
         {/* ТРАНСКРИПЦИЯ */}
-        {pronunciation && (
+        {transcription && (
           <div className="text-muted-foreground italic text-lg">
-            [{pronunciation}]
+            {transcription}
           </div>
         )}
 
