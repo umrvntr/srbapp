@@ -17,51 +17,40 @@ interface WordCardProps {
   currentWordIndex: number;
 }
 
-// Memoize the component to prevent unnecessary re-renders
-export const WordCard = React.memo(function WordCard({ 
-  word, 
-  onReveal, 
-  revealed, 
-  currentWordIndex 
+export const WordCard = React.memo(function WordCard({
+  word,
+  onReveal,
+  revealed,
+  currentWordIndex
 }: WordCardProps) {
   const [showLatin, setShowLatin] = useState(true);
   const { language } = useLanguage();
   const t = translations[language];
   const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
-  const isInitialMount = useRef(true);
 
-  // Initialize speech synthesis
   useEffect(() => {
     if (typeof window !== 'undefined') {
       speechSynthesisRef.current = window.speechSynthesis;
     }
   }, []);
 
-  // Memoize the audio handler with proper cleanup
   const handlePlayAudio = useCallback((text: string, lang: string = 'sr-RS') => {
     if (speechSynthesisRef.current) {
-      // Cancel any ongoing speech
       speechSynthesisRef.current.cancel();
-      
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
       speechSynthesisRef.current.speak(utterance);
-    } else {
-      console.warn('Text-to-speech is not supported in your browser.');
     }
   }, []);
 
-  // Memoize the reveal handler
   const handleReveal = useCallback(() => {
     onReveal(!revealed);
   }, [onReveal, revealed]);
 
-  // Memoize the script toggle handler
   const handleScriptToggle = useCallback((checked: boolean) => {
     setShowLatin(checked);
   }, []);
 
-  // Memoize derived values only if they're used in multiple places
   const { serbianText, pronunciation, translation, example } = useMemo(() => ({
     serbianText: showLatin ? word?.serbian_latin : word?.serbian_cyrillic,
     pronunciation: showLatin ? word?.transcription_en : word?.transcription_ru,
@@ -69,7 +58,6 @@ export const WordCard = React.memo(function WordCard({
     example: language === 'ru' ? word?.example_ru : word?.example_en
   }), [word, showLatin, language]);
 
-  // Early return for missing word
   if (!word) {
     console.warn("WordCard: received undefined word at index", currentWordIndex);
     return (
@@ -99,51 +87,42 @@ export const WordCard = React.memo(function WordCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-6 md:p-8">
-        <div className="mb-6">
-          <h2 className="text-5xl font-bold text-primary mb-2" lang="sr">
+
+      <CardContent className="p-6 text-center space-y-6">
+        {/* ГЛАВНОЕ СЛОВО — большое, жирное, в стиле flashcards */}
+        <div className="text-center">
+          <div className="text-[64px] leading-tight font-extrabold tracking-wide">
             {serbianText}
-          </h2>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => handlePlayAudio(serbianText)} 
-            aria-label="Play audio"
-          >
-            <Volume2 className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <Button variant="ghost" className="mt-2" onClick={() => handlePlayAudio(serbianText)}>
+            <Volume2 className="h-6 w-6" />
           </Button>
         </div>
 
-        {revealed ? (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            <p className="text-2xl text-foreground">
-              {translation}
-            </p>
-            <Separator />
-            <div className="space-y-2">
-              <p className="text-md text-muted-foreground italic" lang="sr">
-                "{word.example_sr}"
-              </p>
-              <p className="text-md text-muted-foreground italic">
-                "{example}"
-              </p>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {pronunciation}
-            </div>
+        {/* ТРАНСКРИПЦИЯ */}
+        {pronunciation && (
+          <div className="text-muted-foreground italic text-lg">
+            [{pronunciation}]
           </div>
+        )}
+
+        <Separator />
+
+        {/* ПЕРЕВОД и ПРИМЕР — только если открыт ответ */}
+        {revealed ? (
+          <>
+            <div className="text-xl">{translation}</div>
+            <div className="text-sm text-muted-foreground">{example}</div>
+          </>
         ) : (
-          <p className="text-xl text-muted-foreground">
+          <div className="text-muted-foreground italic text-base">
             {t.prompt}
-          </p>
+          </div>
         )}
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleReveal} 
-          variant="outline" 
-          className="w-full"
-        >
+
+      <CardFooter className="flex justify-center py-4">
+        <Button onClick={handleReveal} variant="secondary">
           {revealed ? t.hideAnswer : t.showAnswer}
         </Button>
       </CardFooter>
